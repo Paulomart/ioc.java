@@ -8,6 +8,10 @@ public interface ExceptionHandler {
 		public <T> T handleExceptionOnInstantiation(Class<T> clazz, Exception exception) throws Exception {
 			return null;
 		}
+
+		@Override
+		public <T> void handleExceptionOnDestruction(T instance, Class<T> clazz, Exception exception) {
+		}
 	};
 	public static final ExceptionHandler THROWING = new ExceptionHandler() {
 
@@ -15,7 +19,13 @@ public interface ExceptionHandler {
 		public <T> T handleExceptionOnInstantiation(Class<T> clazz, Exception exception) throws Exception {
 			throw exception;
 		}
+
+		@Override
+		public <T> void handleExceptionOnDestruction(T instance, Class<T> clazz, Exception exception) {
+		}
 	};
 
 	<T> T handleExceptionOnInstantiation(Class<T> clazz, Exception exception) throws Exception;
+
+	<T> void handleExceptionOnDestruction(T instance, Class<T> clazz, Exception exception);
 }

@@ -1,9 +1,11 @@
 package de.paulomart.ioc;
 
 import java.lang.reflect.Constructor;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
@@ -58,6 +60,9 @@ public class Container {
 			}
 			registerClass(iface, impl);
 		}
+		if (!searchClass.isInterface() && searchClass.getSuperclass() != null && searchClass.getSuperclass() != Object.class) {
+			registerClass(searchClass.getSuperclass(), impl);
+		}
 	}
 
 	public void registerClasses(ClassLoader classLoader, String prefix) throws Exception {
@@ -78,6 +83,27 @@ public class Container {
 			instances.put(asClass, instance);
 		} finally {
 			lock.writeLock().unlock();
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public void destoryInstances() throws Exception {
+		Collection<Entry<Class<?>, Object>> instancesToDestroy;
+		lock.writeLock().lock();
+		try {
+			instancesToDestroy = instances.entrySet();
+			instances.clear();
+		} finally {
+			lock.writeLock().unlock();
+		}
+		for (Entry<Class<?>, Object> entry : instancesToDestroy) {
+			Object instance = entry.getValue();
+			Class<Object> forClass = (Class<Object>) entry.getKey();
+			try {
+				lifeCycleHook.onInstanceDestroyed(instance, forClass);
+			} catch (Exception ex) {
+				exceptionHandler.handleExceptionOnDestruction(instance, forClass, ex);
+			}
 		}
 	}
 
@@ -173,5 +199,16 @@ public class Container {
 			index++;
 		}
 		return constructor.newInstance(parameters);
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder s = new StringBuilder(getClass().getName());
+		s.append("(classes={");
+		classes.forEach((key, value) -> s.append("\n").append(key).append("=").append(value));
+		s.append("\n}, instances={");
+		instances.forEach((key, value) -> s.append("\n").append(key).append("=").append(value));
+		s.append("\n})");
+		return s.toString();
 	}
 }

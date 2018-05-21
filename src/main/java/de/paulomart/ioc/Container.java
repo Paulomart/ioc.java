@@ -1,8 +1,10 @@
 package de.paulomart.ioc;
 
 import java.lang.reflect.Constructor;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -19,7 +21,7 @@ import de.paulomart.ioc.lifecycle.LifeCycleHook;
 
 public class Container {
 
-	private final Map<Class<?>, Object> instances = new HashMap<>();
+	private final LinkedHashMap<Class<?>, Object> instances = new LinkedHashMap<>();
 	private final Map<Class<?>, Class<?>> classes = new HashMap<>();
 	private final ReadWriteLock lock = new ReentrantReadWriteLock(true);
 	private final LifeCycleHook lifeCycleHook;
@@ -86,16 +88,22 @@ public class Container {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
+	@Deprecated
 	public void destoryInstances() throws Exception {
-		Collection<Entry<Class<?>, Object>> instancesToDestroy;
+		destroyInstances();
+	}
+
+	@SuppressWarnings("unchecked")
+	public void destroyInstances() throws Exception {
+		List<Entry<Class<?>, Object>> instancesToDestroy;
 		lock.writeLock().lock();
 		try {
-			instancesToDestroy = instances.entrySet();
+			instancesToDestroy = new ArrayList<>(instances.entrySet());
 			instances.clear();
 		} finally {
 			lock.writeLock().unlock();
 		}
+		Collections.reverse(instancesToDestroy);
 		for (Entry<Class<?>, Object> entry : instancesToDestroy) {
 			Object instance = entry.getValue();
 			Class<Object> forClass = (Class<Object>) entry.getKey();

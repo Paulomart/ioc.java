@@ -32,13 +32,23 @@ class ClassDiscoverHelper {
 		this.classNamePredicate = classNamePredicate;
 	}
 
-	void search() throws Exception {
+	void search() {
 		for (URL url : getRootUrls()) {
 			File f = new File(url.getPath());
 			if (f.isDirectory()) {
-				visitFile(f);
+				try {
+					visitFile(f);
+				} catch (Exception e) {
+					System.out.println("Error visiting file " + f + ".");
+					e.printStackTrace();
+				}
 			} else {
-				visitJar(url);
+				try {
+					visitJar(url);
+				} catch (Exception e) {
+					System.out.println("Error visiting jar " + url + ".");
+					e.printStackTrace();
+				}
 			}
 		}
 	}

@@ -91,7 +91,8 @@ class ClassDiscoverHelper {
 				JarInputStream jarIn = new JarInputStream(urlIn)) {
 			JarEntry entry;
 			while ((entry = jarIn.getNextJarEntry()) != null) {
-				if (entry.getName().endsWith(".class")) {
+				String javaName = entry.getName().replace('/', '.');
+				if (classNamePredicate.test(javaName) && entry.getName().endsWith(".class")) {
 					handleClass(jarIn);
 				}
 			}
@@ -113,7 +114,8 @@ class ClassDiscoverHelper {
 		}
 	}
 
-	private static final String IOC_DISCOVER_DESC = "L" + AutoDiscover.class.getName().replace('.', '/') + ";";
+	private static final String IOC_DISCOVER_LEGACY_DESC = "L" + AutoDiscover.class.getName().replace('.', '/') + ";";
+	private static final String IOC_DISCOVER_DESC = "L" + AutoRegister.class.getName().replace('.', '/') + ";";
 
 	private class DiscoverClassVisitor extends ClassVisitor {
 
@@ -132,6 +134,9 @@ class ClassDiscoverHelper {
 		@Override
 		public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
 			if (desc.equals(IOC_DISCOVER_DESC)) {
+				hasAnnotation = true;
+			}
+			if (desc.equals(IOC_DISCOVER_LEGACY_DESC)) {
 				hasAnnotation = true;
 			}
 			return null;

@@ -5,8 +5,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Deprecated
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
-public @interface AutoDiscover {
+public @interface AutoRegister {
+
+	InstanceType value();
+
+	public enum InstanceType {
+		SINGLETON,
+		TRANSIENT,
+	}
 }

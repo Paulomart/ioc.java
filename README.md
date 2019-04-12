@@ -21,7 +21,7 @@ Include the project as dependency:
 <dependency>
   <groupId>de.paulomart</groupId>
   <artifactId>ioc</artifactId>
-  <version>2.0.2</version>
+  <version>3.0.0</version>
 </dependency>
 ```
 

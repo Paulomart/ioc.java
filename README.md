@@ -27,14 +27,41 @@ Include the project as dependency:
 
 **Example**
 
-```java
-// create a instance of the container
-Container container = new Container();
-// register a given class to the container
-// the class A implements the InterfaceA
-container.registerClass(A.class);
-// resolve a instance implementing interface
-InterfaceA myInstance = container.resolve(InterfaceA.class);
+```plantuml
+
+@startuml
+
+hide empty members
+
+class Foo implements InterfaceA {
+}
+
+class Bar implements InterfaceB {
+}
+
+@enduml
+
 ```
 
-For a more detailed example see the [`src/examples/java`](src/examples/java/) Folder.
+```java
+
+// create a instance of the container
+Container container = new Container();
+
+container.registerTransient(Foo.class);
+container.registerSingeltion(Bar.class);
+
+
+// resolves new instance everytime
+InterfaceA a1 = container.resolve(InterfaceA.class);
+InterfaceA a2 = container.resolve(InterfaceA.class);
+// => a1 != a2
+
+// resolves to the same instance everytime
+InterfaceB b1 = container.resolve(InterfaceB.class);
+InterfaceB b2 = container.resolve(InterfaceB.class);
+// => b1 == b2
+
+```
+
+For a more detailed example see the [`src/examples/java`](src/examples/java/) folder.

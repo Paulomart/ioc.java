@@ -1,13 +1,14 @@
 package de.paulomart.ioc.examples;
 
-import de.paulomart.ioc.AutoDiscover;
+import de.paulomart.ioc.AutoRegister;
+import de.paulomart.ioc.AutoRegister.InstanceType;
 import de.paulomart.ioc.lifecycle.Initializable;
 
-@AutoDiscover
+@AutoRegister(InstanceType.TRANSIENT)
 public class A implements InterfaceA, Initializable {
 
 	public A() {
-		System.out.println("A.A()");
+		System.out.println("A.A() -> " + this);
 	}
 
 	@Override
